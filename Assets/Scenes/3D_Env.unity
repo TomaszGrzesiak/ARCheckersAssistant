@@ -412,11 +412,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d988459a0e80a8247b2f8a4b6aecceb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  coordinates: []
   redChecker: {fileID: 2083898656128409207, guid: b23ddbf544135cc43882a113c6b14231,
     type: 3}
   blackChecker: {fileID: 2585162680986948823, guid: a0ae77f6fc405fb4793e8ed65844283b,
     type: 3}
+  coordianteGameObject: {fileID: 480282913}
+  coordinates: []
 --- !u!1 &279441531
 GameObject:
   m_ObjectHideFlags: 0
