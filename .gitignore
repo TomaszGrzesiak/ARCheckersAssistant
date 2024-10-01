@@ -77,7 +77,3 @@ crashlytics-build.properties
 
 #vscode
 *.vsconfig
-
-# Ignore Project and Asset Settings
-/ProjectSettings
-/Assets/Settings
