@@ -80,4 +80,4 @@ crashlytics-build.properties
 
 # Ignore Project and Asset Settings
 /ProjectSettings/
-/Assets/Settings/
+/Assets/Settings
