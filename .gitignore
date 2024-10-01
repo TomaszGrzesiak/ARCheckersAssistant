@@ -73,3 +73,11 @@ crashlytics-build.properties
 
 #JetBrains Rider files
 .idea/
+
+
+#vscode
+*.vsconfig
+
+# Ignore Project and Asset Settings
+/ProjectSettings/
+/Assets/Settings/
