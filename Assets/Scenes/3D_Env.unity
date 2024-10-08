@@ -412,12 +412,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d988459a0e80a8247b2f8a4b6aecceb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inputActions: {fileID: -944628639613478452, guid: b42679491dd258042a95b0a61b6f0845,
+    type: 3}
+  arrowObj: {fileID: 2765336893358883848, guid: c59960afc03e219488b095f78fe1aec2,
+    type: 3}
   redChecker: {fileID: 2083898656128409207, guid: b23ddbf544135cc43882a113c6b14231,
     type: 3}
   blackChecker: {fileID: 2585162680986948823, guid: a0ae77f6fc405fb4793e8ed65844283b,
     type: 3}
   coordianteGameObject: {fileID: 480282913}
   coordinates: []
+  speed: 1
 --- !u!1 &279441531
 GameObject:
   m_ObjectHideFlags: 0
@@ -1420,13 +1425,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 974611067}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: 0.2588186, y: -0, z: -0, w: 0.965926}
+  m_LocalPosition: {x: 0, y: 1.51, z: -1.87}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 30, y: 0, z: 0}
 --- !u!114 &974611071
 MonoBehaviour:
   m_ObjectHideFlags: 0

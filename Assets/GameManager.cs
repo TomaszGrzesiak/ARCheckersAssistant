@@ -1,9 +1,15 @@
 using System.Runtime.CompilerServices;
 using Unity.XR.CoreUtils;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
+
+    public InputActionAsset inputActions;
+
+    private InputAction touchOrClickAction;
+    public GameObject arrowObj;
     public GameObject redChecker;
     public GameObject blackChecker;
     public GameObject coordianteGameObject;
@@ -17,24 +23,40 @@ public class GameManager : MonoBehaviour
     {
         PreLoad();
         PlaceChecker("Black", "2B");
+
+
+        
     }
 
     // Update is called once per frame
     void Update()
-    {
-        Advice("2B", "4C", 1);
+    {   
+        Advice("2B", "8H", 1);
+        if(Mouse.current.leftButton.isPressed){
+            RemoveChecker("Black", "2B");
+        }
     }
 
     void Advice(string checker, string goal, int color){
         GameObject checkerObj = null;
         GameObject goalObj = null;
         GameObject startPos = null;
+        GameObject arrowO = null;
+        Vector3 arrowPosition = new Vector3();
         for (int i = 0; i < coordinates.Length; i++)
         {
             if (checker.Equals(coordinates[i].name))
             {
                 checkerObj = coordinates[i].gameObject.transform.GetChild(color).gameObject;
                 startPos = coordinates[i].gameObject;
+                arrowO = coordinates[i].gameObject.transform.GetChild(2).gameObject;
+
+                if (!arrowO.activeSelf && checkerObj.activeSelf)
+                {
+                    arrowO.SetActive(true);
+                }
+                arrowPosition = coordinates[i].transform.position;
+                arrowPosition.y += 0.2f;
             }
             if (goal.Equals(coordinates[i].name))
             {
@@ -46,6 +68,11 @@ public class GameManager : MonoBehaviour
         progress += Time.deltaTime * speed;
 
         checkerObj.transform.position = Vector3.Lerp(startPos.transform.position, goalObj.transform.position, progress);
+        Vector3 arrowGoalPos = goalObj.transform.position;
+        arrowGoalPos.y += 0.2f;
+        arrowO.transform.position = Vector3.Lerp(arrowPosition, goalObj.transform.position, progress);
+
+        
 
         // If Lerp is complete (progress >= 1), reset the position
         if (progress >= 1.5f)
@@ -54,6 +81,7 @@ public class GameManager : MonoBehaviour
             checkerObj.transform.position = goalObj.transform.position; // Move back to the starting position
         }
     }
+
     void PlaceChecker(string type, string position){
         for (int i = 0; i < coordinates.Length; i++)
         {
@@ -65,7 +93,20 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-
+    void RemoveChecker(string type, string position)
+    {
+        for (int i = 0; i < coordinates.Length; i++)
+        {
+            if (position.Equals(coordinates[i].name))
+            {
+                if (type.Equals("Red"))
+                    coordinates[i].gameObject.transform.GetChild(0).gameObject.SetActive(false);
+                else if (type.Equals("Black"))
+                    coordinates[i].gameObject.transform.GetChild(1).gameObject.SetActive(false);
+            }
+            coordinates[i].gameObject.transform.GetChild(2).gameObject.SetActive(false);
+        }
+    }
     void PreLoad(){
         int coordCount = coordianteGameObject.transform.childCount;
         coordinates = new GameObject[coordCount];
@@ -79,6 +120,15 @@ public class GameManager : MonoBehaviour
             coordinates[i].gameObject.transform.GetChild(0).gameObject.SetActive(false);
             Instantiate(blackChecker, coordinates[i].transform.gameObject.transform);
             coordinates[i].gameObject.transform.GetChild(1).gameObject.SetActive(false);
+            Vector3 arrowPos = coordinates[i].transform.position;
+            arrowPos.y += 0.2f;
+
+            // Instantiate the arrow object at the new position and set it as a child of the coordinate
+            GameObject arrowInstance = Instantiate(arrowObj, arrowPos, coordinates[i].transform.rotation);
+
+            arrowInstance.transform.SetParent(coordinates[i].transform);
+            arrowInstance.SetActive(false); // Set the parent to the coordinate
+            //coordinates[i].gameObject.transform.GetChild(1).gameObject.SetActive(false);
         }
     }
 }
