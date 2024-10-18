@@ -24,6 +24,7 @@ public class CheckerDetectPlane : MonoBehaviour
         // XANA cia
         // Convert the webcam frame to OpenCV Mat
         Mat frame = OpenCvSharp.Unity.TextureToMat(_webCamTexture);
+        Debug.Log("frame: " + frame.ToString());
         InfoText.text = "B";
 
         // Detect and display circles

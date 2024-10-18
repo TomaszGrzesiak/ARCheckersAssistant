@@ -1,49 +1,56 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
+using System.Collections.Generic;
 
 public class ImageOutlineTracker : MonoBehaviour
 {
     private ARTrackedImageManager trackedImageManager;
-    private LineRenderer lineRenderer;
-    public GameObject lineObject;
+    public GameObject linePrefab;  // Prefab containing LineRenderer
     public TextMeshProUGUI info;
+
+    // Dictionary to store LineRenderers for each tracked image
+    private Dictionary<ARTrackedImage, LineRenderer> lineRenderers = new Dictionary<ARTrackedImage, LineRenderer>();
 
     void Awake()
     {
         // Find the ARTrackedImageManager component in the scene
         trackedImageManager = Object.FindAnyObjectByType<ARTrackedImageManager>();
-        lineRenderer = lineObject.GetComponent<LineRenderer>();
-
-        // Set the number of positions for the LineRenderer (4 points + loop closure)
-        lineRenderer.positionCount = 5;
-        lineRenderer.loop = true;
         info.text = "searchin'";
     }
 
     void OnEnable()
     {
-        // Subscribe to the trackablesChanged event using AddListener
-        trackedImageManager.trackablesChanged.AddListener(OnTrackablesChanged);
-        info.text = "ENABLED'";
+        trackedImageManager.trackedImagesChanged += OnTrackablesChanged;
+        info.text = "ENABLED";
     }
 
     void OnDisable()
     {
-        // Unsubscribe from the trackablesChanged event
-        trackedImageManager.trackablesChanged.RemoveListener(OnTrackablesChanged);
-        info.text = "DISABLED'";
+        trackedImageManager.trackedImagesChanged -= OnTrackablesChanged;
+        info.text = "DISABLED";
     }
 
     // This method will be called when AR Tracked Images are added, updated, or removed
-    void OnTrackablesChanged(ARTrackablesChangedEventArgs<ARTrackedImage> eventArgs)
+    void OnTrackablesChanged(ARTrackedImagesChangedEventArgs eventArgs)
     {
         // Handle added tracked images
         foreach (var addedImage in eventArgs.added)
         {
-            DrawOutline(addedImage);
+            // Create a new LineRenderer for the added image
+            GameObject newLineObject = Instantiate(linePrefab);
+            LineRenderer newLineRenderer = newLineObject.GetComponent<LineRenderer>();
+
+            // Set positions for the LineRenderer (4 points + loop closure)
+            newLineRenderer.positionCount = 5;
+            newLineRenderer.loop = true;
+
+            // Store the new LineRenderer in the dictionary
+            lineRenderers[addedImage] = newLineRenderer;
+
+            // Draw the outline
+            DrawOutline(addedImage, newLineRenderer);
         }
 
         // Handle updated tracked images
@@ -51,25 +58,39 @@ public class ImageOutlineTracker : MonoBehaviour
         {
             if (updatedImage.trackingState == TrackingState.Tracking)
             {
-                DrawOutline(updatedImage);
-                info.text = "board found";
+                // Draw the outline for the updated image
+                if (lineRenderers.ContainsKey(updatedImage))
+                {
+                    DrawOutline(updatedImage, lineRenderers[updatedImage]);
+                    info.text = "board found";
+                }
             }
             else
             {
-                lineRenderer.enabled = false;  // Disable line if the image is no longer tracked
-                info.text = "nyrandu ;c";
+                // Disable LineRenderer if the image is not tracked
+                if (lineRenderers.ContainsKey(updatedImage))
+                {
+                    lineRenderers[updatedImage].enabled = false;
+                    info.text = "nyrandu ;c";
+                }
             }
         }
 
         // Handle removed tracked images
         foreach (var removedImage in eventArgs.removed)
         {
-            lineRenderer.enabled = false;  // Disable the outline when the image is removed
+            // Disable and destroy the LineRenderer for the removed image
+            if (lineRenderers.ContainsKey(removedImage))
+            {
+                lineRenderers[removedImage].enabled = false;
+                Destroy(lineRenderers[removedImage].gameObject);
+                lineRenderers.Remove(removedImage);
+            }
         }
     }
 
     // Method to draw an outline around the tracked image
-    void DrawOutline(ARTrackedImage trackedImage)
+    void DrawOutline(ARTrackedImage trackedImage, LineRenderer lineRenderer)
     {
         // Get the size of the tracked image
         Vector2 size = trackedImage.size;
@@ -87,7 +108,7 @@ public class ImageOutlineTracker : MonoBehaviour
         lineRenderer.SetPosition(3, bottomLeft);
         lineRenderer.SetPosition(4, topLeft);  // Close the loop
 
-        // Enable the line renderer to display the outline
+        // Enable the LineRenderer to display the outline
         lineRenderer.enabled = true;
     }
 }
